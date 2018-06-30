@@ -37,11 +37,23 @@ contract TNStoken is Ownable {
     }
 
     function decreaseLockedAmount(address _owner, uint256 _amount) onlyOwner public returns (uint256) {
+        uint256 amt = _amount;
         require(locked[_owner] > 0, "Cannot go negative. Already at 0 locked tokens.");
-        uint256 lockingAmount = locked[_owner].sub(_amount);
+        if (amt > locked[_owner]) {
+            amt = locked[_owner];
+        }
+        uint256 lockingAmount = locked[_owner].sub(amt);
         locked[_owner] = lockingAmount;
         emit Locked(_owner, lockingAmount);
         return lockingAmount;
+    }
+
+    function getLockedAmount(address _owner) view public returns (uint256) {
+        return locked[_owner];
+    }
+
+    function getUnlockedAmount(address _owner) view public returns (uint256) {
+        return balances[_owner].sub(locked[_owner]);
     }
 
     function balanceOf(address _owner) public view returns (uint256) {
