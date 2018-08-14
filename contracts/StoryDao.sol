@@ -21,6 +21,7 @@ contract LockableToken is Ownable {
     function decreaseLockedAmount(address _owner, uint256 _amount) public returns (uint256);
     function getLockedAmount(address _owner) view public returns (uint256);
     function getUnlockedAmount(address _owner) view public returns (uint256);
+    function unlockForAll() public;
 }
 
 contract StoryDao is Ownable {
@@ -117,6 +118,12 @@ contract StoryDao is Ownable {
         require(_token != address(0), "Token address cannot be null-address");
         token = LockableToken(_token);
         deadline = now + durationDays * 1 days;
+    }
+
+    function bigRedButton() onlyOwner external {
+        active = false;
+        withdrawToOwner();
+        token.unlockForAll();
     }
 
     function endStory() storyActive public {
@@ -289,7 +296,7 @@ contract StoryDao is Ownable {
         );
         
         nonDeletedSubmissions += 1;
-        withdrawableByOwner += fee / daofee;
+        withdrawableByOwner += fee.div(daofee);
         if (nonDeletedSubmissions >= durationSubmissions) {
             endStory();
         }
@@ -332,7 +339,7 @@ contract StoryDao is Ownable {
         require(blacklist[_offender] == true, "Can't unblacklist a non-blacklisted user :/");
         require(notVoting(_offender), "Offender must not be involved in a vote.");
         withdrawableByOwner = withdrawableByOwner.add(msg.value);
-        blacklist[_offender] == false;
+        blacklist[_offender] = false;
         token.decreaseLockedAmount(_offender, token.balanceOf(_offender));
         emit Blacklisted(_offender, false);
     }
@@ -445,7 +452,7 @@ contract StoryDao is Ownable {
         withdrawableByOwner = withdrawableByOwner.sub(withdraw);
     }
 
-    function withdrawDividend() external {
+    function withdrawDividend() memberOnly external {
         require(active == false);
         uint256 owed = address(this).balance.div(whitelistedNumber);
         msg.sender.transfer(owed);

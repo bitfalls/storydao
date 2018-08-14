@@ -1,0 +1,62 @@
+@supports (grid-area: auto) {
+    .grid-container{
+      display: grid;
+      grid-template-columns: 6fr 5fr 4fr;
+      grid-template-rows: 10rem ;
+      grid-column-gap: 0.5rem;
+      grid-row-gap: 0.5rem;
+      justify-items: stretch;
+      align-items: stretch;
+      grid-template-areas:
+      "header header information"
+      "content events information";
+      height: 100vh;
+    }
+    .events {
+      grid-area: events;
+    }
+    .content {
+      grid-area: content;
+    }
+    .information {
+      grid-area: information;
+    }
+    .header {
+      grid-area: header;
+      text-align: center;
+    }
+
+    .container {
+        border: 1px solid black;
+        padding: 15px;
+        overflow-y: scroll;
+    }
+
+    p {
+        margin: 0;
+    }
+  }
+
+body {
+    padding: 0;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+div.avatar {
+    width: 100%;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.submission_input {
+  
+}
+
+.submission_input textarea {
+  width: 100%;
+}
+
+.content-submissions .submission-submitter {
+  font-size: small;
+}

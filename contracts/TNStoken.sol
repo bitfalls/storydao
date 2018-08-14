@@ -9,6 +9,7 @@ contract TNStoken is Ownable {
 
     mapping(address => uint256) balances;
     mapping(address => uint256) locked;
+    address[] touchedByLock;
     mapping (address => mapping (address => uint256)) internal allowed;
     uint256 totalSupply_;
 
@@ -28,15 +29,25 @@ contract TNStoken is Ownable {
         balances[msg.sender] = totalSupply_;
     }
 
-    function increaseLockedAmount(address _owner, uint256 _amount) onlyOwner public returns (uint256) {
+    /**
+    @dev _owner will be prevented from sending _amount of tokens. Anything
+beyond this amount will be spendable.
+    */
+    function increaseLockedAmount(address _owner, uint256 _amount) public onlyOwner returns (uint256) {
         uint256 lockingAmount = locked[_owner].add(_amount);
         require(balanceOf(_owner) >= lockingAmount, "Locking amount must not exceed balance");
         locked[_owner] = lockingAmount;
+        touchedByLock.push(_owner);
         emit Locked(_owner, lockingAmount);
         return lockingAmount;
     }
 
-    function decreaseLockedAmount(address _owner, uint256 _amount) onlyOwner public returns (uint256) {
+    /**
+    @dev _owner will be allowed to send _amount of tokens again. Anything
+remaining locked will still not be spendable. If the _amount is greater
+than the locked amount, the locked amount is zeroed out. Cannot be neg.
+    */
+    function decreaseLockedAmount(address _owner, uint256 _amount) public onlyOwner returns (uint256) {
         uint256 amt = _amount;
         require(locked[_owner] > 0, "Cannot go negative. Already at 0 locked tokens.");
         if (amt > locked[_owner]) {
@@ -48,20 +59,14 @@ contract TNStoken is Ownable {
         return lockingAmount;
     }
 
-    function getLockedAmount(address _owner) view public returns (uint256) {
-        return locked[_owner];
-    }
-
-    function getUnlockedAmount(address _owner) view public returns (uint256) {
-        return balances[_owner].sub(locked[_owner]);
-    }
-
-    function balanceOf(address _owner) public view returns (uint256) {
-        return balances[_owner];
-    }
-
-    function totalSupply() public view returns (uint256) {
-        return totalSupply_;
+    /**
+    @dev unlocks the tokens of every user who ever had any tokens locked for them
+    */
+    function unlockForAll() public onlyOwner {
+        uint256 len = touchedByLock.length;
+        for (uint256 i = 0; i < len; i++) {
+            locked[touchedByLock[i]] = 0;
+        }
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
@@ -78,10 +83,6 @@ contract TNStoken is Ownable {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
-    }
-
-    function allowance(address _owner, address _spender) public view returns (uint256) {
-        return allowed[_owner][_spender];
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
@@ -114,43 +115,30 @@ contract TNStoken is Ownable {
         return true;
     }
 
-    function approveAndCall(address _spender, uint256 _value, bytes _data) public payable returns (bool) {
-        require(_spender != address(this));
-        this.approve(_spender, _value);
-        // solium-disable-next-line security/no-call-value
-        require(_spender.call.value(msg.value)(_data));
-        return true;
+    /**
+    @dev Returns number of tokens the address is still prevented from using
+    */
+    function getLockedAmount(address _owner) public view returns (uint256) {
+        return locked[_owner];
     }
 
-    function transferAndCall(address _to, uint256 _value, bytes _data) public payable returns (bool) {
-        require(_to != address(this));
-        this.transfer(_to, _value);
-        // solium-disable-next-line security/no-call-value
-        require(_to.call.value(msg.value)(_data));
-        return true;
+    /**
+    @dev Returns number of tokens the address is allowed to send
+    */
+    function getUnlockedAmount(address _owner) public view returns (uint256) {
+        return balances[_owner].sub(locked[_owner]);
     }
 
-    function transferFromAndCall(address _from, address _to, uint256 _value, bytes _data ) public payable returns (bool) {
-        require(_to != address(this));
-        this.transferFrom(_from, _to, _value);
-        // solium-disable-next-line security/no-call-value
-        require(_to.call.value(msg.value)(_data));
-        return true;
+    function balanceOf(address _owner) public view returns (uint256) {
+        return balances[_owner];
     }
 
-    function increaseApprovalAndCall(address _spender, uint _addedValue, bytes _data) public payable returns (bool) {
-        require(_spender != address(this));
-        this.increaseApproval(_spender, _addedValue);
-        // solium-disable-next-line security/no-call-value
-        require(_spender.call.value(msg.value)(_data));
-        return true;
+    function totalSupply() public view returns (uint256) {
+        return totalSupply_;
     }
 
-    function decreaseApprovalAndCall(address _spender, uint _subtractedValue, bytes _data) public payable returns (bool) {
-        require(_spender != address(this));
-        this.decreaseApproval(_spender, _subtractedValue);
-        // solium-disable-next-line security/no-call-value
-        require(_spender.call.value(msg.value)(_data));
-        return true;
+    function allowance(address _owner, address _spender) public view returns (uint256) {
+        return allowed[_owner][_spender];
     }
+
 }

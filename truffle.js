@@ -30,12 +30,21 @@ module.exports = {
         return new WalletProvider(
           Wallet.fromPrivateKey(
             Buffer.from(PRIVKEY, "hex")), "https://rinkeby.infura.io/"+INFURAKEY
-          
         );
       },
       gas: 4600000,
-      gasPrice: w3.utils.toWei("50", "gwei"),
+      gasPrice: w3.toWei("50", "gwei"),
       network_id: "3",
+    },
+    mainnet: {
+      provider: function() {
+        return new WalletProvider(
+          Wallet.fromPrivateKey(
+            Buffer.from(PRIVKEY, "hex")), "https://mainnet.infura.io/"+INFURAKEY
+        );
+      },
+      gasPrice: w3.toWei("20", "gwei"),
+      network_id: "1",
     },
   }
 };

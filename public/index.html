@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+
+<html lang="en">
+
+<head>
+    <title>The Neverending Story</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="The Neverending Story is an community curated and moderated Ethereum dapp-story">
+    <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+
+<body>
+
+    <div class="grid-container">
+        <div class="header container">
+            <h1>The Neverending Story</h1>
+            <p>A story on the Ethereum blockchain, community curated and moderated through a Decentralized Autonomous Organization
+                (DAO)</p>
+        </div>
+        <div class="content container">
+            <div class="intro">
+                <h3>Chapter 0</h3>
+                <p class="intro">It's a rainy night in central London.</p>
+            </div>
+            <hr>
+            <div class="submission_input">
+                <textarea name="submission-body" id="submission-body-input" rows="5"></textarea>
+                <button id="submission-body-btn">Submit</button>
+            </div>
+            <hr>
+            <div class="content-submissions">
+                
+            </div>
+        </div>
+        <div class="events container">
+            <h3>Latest Events</h3>
+            <ul class="eventlist">
+
+            </ul>
+        </div>
+        <div class="information container">
+            <div class="logged out">
+                <p>You seem to be logged out of MetaMask or MetaMask isn't installed. Please log into MetaMask - to learn more,
+                    see
+                    <a href="https://bitfalls.com/2018/02/16/metamask-send-receive-ether/">this tutorial</a>.</p>
+            </div>
+            <div class="logged in" style="display: none">
+                <p>You are logged in!</p>
+                <div class="avatar">
+
+                </div>
+                <dl>
+                    <dt>Submissions</dt>
+                    <dd id="user_submissions"></dd>
+                    <dt>Proposals</dt>
+                    <dd id="user_proposals"></dd>
+                    <dt>Votes</dt>
+                    <dd id="user_votes"></dd>
+                    <dt>Deletions</dt>
+                    <dd id="user_deletions"></dd>
+                    <dt class="user_whitelisted">Whitelisted</dt>
+                    <dd class="user_whitelisted">Yes</dd>
+                    <dt class="user_blacklisted">Blacklisted</dt>
+                    <dd class="user_blacklisted">Yes</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/web3.min.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/blockies.min.js"></script>
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
